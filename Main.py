@@ -1,67 +1,13 @@
 import os
 import time
 import threading
-from flask import Flask, render_template, request
+from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
 is_running = False
 
-def convo_task(token, convo_id, hater_name, speed, messages):
-    global is_running
-    is_running = True
-    print("--- Convo Task Started ---")
-    
-    idx = 0
-    while is_running and messages:
-        try:
-            msg = messages[idx % len(messages)]
-            full_msg = f"{hater_name} {msg}".strip()
-            print(f"[SENDING TO {convo_id}] -> {full_msg}")
-            
-            time.sleep(float(speed))
-            idx += 1
-        except Exception as e:
-            print(f"Error: {e}")
-            time.sleep(5)
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/submit', methods=['POST'])
-def submit():
-    token = request.form.get('token')
-    convo_id = request.form.get('convo_id')
-    hater_name = request.form.get('hater_name')
-    speed = request.form.get('speed', 5)
-    
-    file = request.files.get('message_file')
-    messages = []
-    if file:
-        lines = file.read().decode('utf-8').splitlines()
-        messages = [l.strip() for l in lines if l.strip()]
-        
-    with open("TS-TOKEN.txt", "w") as f: f.write(str(token))
-    with open("TS-CONVO.txt", "w") as f: f.write(str(convo_id))
-    with open("TS-NAME.txt", "w") as f: f.write(str(hater_name))
-    with open("TS-SPEED.txt", "w") as f: f.write(str(speed))
-    
-    thread = threading.Thread(target=convo_task, args=(token, convo_id, hater_name, speed, messages), daemon=True)
-    thread.start()
-    
-    return "<h2>Server Started Successfully!</h2><br><a href='/'>Go Back</a>"
-
-@app.route('/stop', methods=['POST'])
-def stop():
-    global is_running
-    is_running = False
-    return "<h2>Server Stopped Successfully!</h2><br><a href='/'>Go Back</a>"
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-<!DOCTYPE html>
+HTML_CODE = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -75,23 +21,21 @@ if __name__ == '__main__':
         }
 
         body {
-    background-color: #0f172a;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://ibb.co/JRBMhx0R');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    background-attachment: fixed;
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
+            background-color: #0f172a;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://ibb.co/JRBMhx0R');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-
-        /* Pure Glass Effect - Background Image Always Visible */
         .card-container {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(8px);
@@ -222,13 +166,11 @@ if __name__ == '__main__':
             </select>
         </div>
 
-        <!-- Single Token Input Field -->
         <div class="form-group" id="singleTokenBox">
             <label>Enter Single Token</label>
             <input type="text" name="token" placeholder="Enter Your Access Token" autocomplete="off">
         </div>
 
-        <!-- Multi Token File Field -->
         <div class="form-group" id="multiTokenBox" style="display: none;">
             <label>Choose Token File (.txt)</label>
             <input type="file" name="token_file" accept=".txt">
@@ -285,4 +227,59 @@ if __name__ == '__main__':
 </script>
 
 </body>
-</html>
+</html>"""
+
+def convo_task(token, convo_id, hater_name, speed, messages):
+    global is_running
+    is_running = True
+    print("--- Convo Task Started ---")
+    
+    idx = 0
+    while is_running and messages:
+        try:
+            msg = messages[idx % len(messages)]
+            full_msg = f"{hater_name} {msg}".strip()
+            print(f"[SENDING TO {convo_id}] -> {full_msg}")
+            
+            time.sleep(float(speed))
+            idx += 1
+        except Exception as e:
+            print(f"Error: {e}")
+            time.sleep(5)
+
+@app.route('/')
+def home():
+    return render_template_string(HTML_CODE)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    token = request.form.get('token')
+    convo_id = request.form.get('convo_id')
+    hater_name = request.form.get('hater_name')
+    speed = request.form.get('speed', 5)
+    
+    file = request.files.get('message_file')
+    messages = []
+    if file:
+        lines = file.read().decode('utf-8').splitlines()
+        messages = [l.strip() for l in lines if l.strip()]
+        
+    with open("R-TOKEN.txt", "w") as f: f.write(str(token))
+    with open("R-CONVO.txt", "w") as f: f.write(str(convo_id))
+    with open("R-NAME.txt", "w") as f: f.write(str(hater_name))
+    with open("R-SPEED.txt", "w") as f: f.write(str(speed))
+    
+    thread = threading.Thread(target=convo_task, args=(token, convo_id, hater_name, speed, messages), daemon=True)
+    thread.start()
+    
+    return "<h2>Server Started Successfully!</h2><br><a href='/'>Go Back</a>"
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    global is_running
+    is_running = False
+    return "<h2>Server Stopped Successfully!</h2><br><a href='/'>Go Back</a>"
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
