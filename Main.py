@@ -155,7 +155,7 @@ HTML_CODE = """<!DOCTYPE html>
 
 <div class="card-container">
     <div class="card-header">
-        R0M30 <span>TH3e</span> L3G3ND
+        R0M30 <span>TH3</span> L3G3ND
     </div>
 
     <form action="/submit" method="POST" enctype="multipart/form-data">
