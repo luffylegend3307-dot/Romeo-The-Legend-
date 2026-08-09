@@ -22,7 +22,8 @@ HTML_CODE = """<!DOCTYPE html>
 
         body {
             background-color: #0f172a;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://ibb.co/JRBMhx0R');
+            /* Exact Direct Image Link Injected Below */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://i.ibb.co/R49vrtw9/59300046-721e-4b46-914b-bd3e2f57b3e8.jpg');
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
